@@ -147,27 +147,31 @@ CDC_parser <- function(year, url) {
   
 }
 
-# Enter year and url (urls are inconsistent, so easier to enter them directly)
-year <- 2013
-url <- "ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/DVS/mortality/mort2013us.zip"
+# Enter desired start and end years
+year_start <- 11
+year_end <- 16
 
-# Now run the function for each year you want:
-CDC_parser(year, url)
-
+# URLs are consistant from 09 - 16
+for (year in year_start:year_end){
+   url <- paste0("ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/DVS/mortality/mort20",year,"us.zip")
+   CDC_parser(year, url)
+}
 
 #########################################################################################################################
 
 # The code below processes the data for FiveThirtyEight's Gun Deaths in America project
 
-# For the project, we used the three most recent years available: 2012-14
+# For the project, we used the three most recent years available at the time: 2012-14
 # We'll combine these into a single data frame.
 # In keeping with CDC practice, we'll eliminate deaths of non-U.S. residents
+for (year in year_start:year_end){
+   load(paste0("gun_deaths_",year,".RData"))
+}
+all_guns <- get(paste0("guns_",year_start))
+for(year in (year_start+1):year_end){
+   all_guns <- rbind(all_guns,get(paste0("guns_",year)))
+}
 
-load("gun_deaths_14.RData")
-load("gun_deaths_13.RData")
-load("gun_deaths_12.RData")
-
-all_guns <- rbind(guns_12, guns_13, guns_14)
 all_guns <- all_guns %>%
   filter(res_status != 4)
 
